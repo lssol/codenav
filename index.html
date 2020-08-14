@@ -8,7 +8,14 @@
         <p>We show some other <code>types of code</code>.</p>
         <p>Sometimes, you can put code inside a big block:</p>
         <pre><code>LSTM(32, stateful=True, batch_input_shape=(1,64,10))</code></pre>
-        <pre></pre>
+        <pre>
+            const commands = e => ({
+                up: e.altKey && e.code == 'KeyK',
+                down: e.altKey && e.code == 'KeyJ',
+                clear: e.code == 'Escape',
+                copy: e.altKey && e.code == 'KeyC'
+            })
+         </pre>
     <script>
         const commands = e => ({
             up: e.altKey && e.code == 'KeyK',
@@ -24,8 +31,26 @@
             return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
         }
 
+        // I'd prefer doing a document.querySelectorAll but
+        // The preorder traversal is necessary to avoid getting both <pre> and <code> when they're nested
+        const getAllCodeTags = (root) => {
+            acceptedTags = ['PRE', 'CODE']
+            codeTags = []
+            const rec = node => {
+                if (acceptedTags.includes(node.tagName)) {
+                    codeTags.push(node)
+                    return
+                }
+                for (child of node.children)
+                    rec(child)
+            }
+            rec(root)
+
+            return codeTags
+        }
+
         const Selector = () => {
-            const codes = Array.from(document.querySelectorAll("code"))
+            const codes = getAllCodeTags(document.getRootNode())
 
             let indexSelected = codes.findIndex(checkVisible)
             let selected = null
@@ -67,7 +92,7 @@
                     clearSelection()
                 },
                 copy: async () => {
-                    await navigator.clipboard.writeText(selected.innerHTML)
+                    await navigator.clipboard.writeText(selected.innerText)
                     selected.style.border = '1px solid green'
                 }
             }
@@ -83,7 +108,8 @@
                     return
 
                 if (!selector) {
-                    selector = Selector()
+                    if (!command.clear)
+                        selector = Selector()
                     return
                 }
 
