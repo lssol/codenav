@@ -34,14 +34,14 @@
         // I'd prefer doing a document.querySelectorAll but
         // The preorder traversal is necessary to avoid getting both <pre> and <code> when they're nested
         const getAllCodeTags = (root) => {
-            acceptedTags = ['PRE', 'CODE']
-            codeTags = []
+            const acceptedTags = ['PRE', 'CODE']
+            const codeTags = []
             const rec = node => {
                 if (acceptedTags.includes(node.tagName)) {
                     codeTags.push(node)
                     return
                 }
-                for (child of node.children)
+                for (let child of node.children)
                     rec(child)
             }
             rec(root)
@@ -68,10 +68,11 @@
                 clearSelection()
                     
                 el.style.border = '1px solid red'
+                if (!checkVisible(el))
+                    el.scrollIntoView(false)
 
                 selected = el
                 styleSelected = el.style
-                // TODO bring it to screen
             }
             select()
 
