@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <title>Test  Codenav</title>
+    </head>
+    <body>
+        <h1>Codenav</h1>
+        <p>Here we show some <code>code</code>.</p>
+        <p>We show some other <code>types of code</code>.</p>
+        <p>Sometimes, you can put code inside a big block:</p>
+        <pre><code>LSTM(32, stateful=True, batch_input_shape=(1,64,10))</code></pre>
+        <pre></pre>
+    <script>
+        const commands = e => ({
+            up: e.altKey && e.code == 'KeyK',
+            down: e.altKey && e.code == 'KeyJ',
+            clear: e.code == 'Escape',
+            copy: e.altKey && e.code == 'KeyC'
+        })
+
+        // https://stackoverflow.com/questions/5353934/check-if-element-is-visible-on-screen
+        const checkVisible = elm => {
+            var rect = elm.getBoundingClientRect();
+            var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+        }
+
+        const Selector = () => {
+            const codes = Array.from(document.querySelectorAll("code"))
+
+            let indexSelected = codes.findIndex(checkVisible)
+            let selected = null
+            let styleSelected = null
+
+            const clearSelection = () => {
+                if (selected)
+                    selected.style = styleSelected
+            }
+            const select = () => {
+                if (codes.length == 0)
+                    return
+
+                const el = codes[indexSelected]
+                clearSelection()
+                    
+                el.style.border = '1px solid red'
+
+                selected = el
+                styleSelected = el.style
+                // TODO bring it to screen
+            }
+            select()
+
+            return {
+                up: () => {
+                    if (indexSelected - 1 < 0)
+                        return
+                    indexSelected--
+                    select()
+                },
+                down: () => {
+                    if (indexSelected + 1 >= codes.length)
+                        return
+                    indexSelected++
+                    select()
+                },
+                clear: () => {
+                    clearSelection()
+                },
+                copy: async () => {
+                    await navigator.clipboard.writeText(selected.innerHTML)
+                    selected.style.border = '1px solid green'
+                }
+            }
+        }
+        
+        window.onload = () => {
+            let selector = null
+
+            window.addEventListener('keydown', e => {
+                let command = commands(e)
+
+                if (!Object.values(command).some(a => a))
+                    return
+
+                if (!selector) {
+                    selector = Selector()
+                    return
+                }
+
+                if (command.up) 
+                    selector.up()
+                else if (command.down)
+                    selector.down()
+                else if (command.clear) {
+                    selector.clear()
+                    selector = null
+                }
+                else if (command.copy) {
+                    selector.copy()
+                }
+            })
+        }
+    </script>
+    </body>
+</html>
