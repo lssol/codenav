@@ -5,7 +5,7 @@
     <body>
         <h1>Codenav</h1>
         <p>Here we show some <code>code</code>.</p>
-        <p>We show some other <code>types of code</code>.</p>
+        <p>We show some other <code style="display:none">This code is hidden</code>.</p>
         <p>Sometimes, you can put code inside a big block:</p>
         <pre><code>LSTM(32, stateful=True, batch_input_shape=(1,64,10))</code></pre>
         <pre>
@@ -65,6 +65,7 @@
                     return
 
                 const el = codes[indexSelected]
+                styleSelected = el.style
                 clearSelection()
                     
                 el.style.border = '1px solid red'
@@ -72,7 +73,6 @@
                     el.scrollIntoView(false)
 
                 selected = el
-                styleSelected = el.style
             }
             select()
 
